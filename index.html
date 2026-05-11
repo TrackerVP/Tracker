@@ -1,1 +1,590 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cesar Trackers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* ===== HOME VIEW ===== */
+        .home-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .header h1 span {
+            color: #4fc3f7;
+        }
+
+        .header p {
+            color: #b0bec5;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .trackers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .tracker-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tracker-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4fc3f7, #42b72a);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tracker-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(79, 195, 247, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tracker-card:hover::before {
+            opacity: 1;
+        }
+
+        .tracker-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .tracker-card h2 {
+            color: #ffffff;
+            font-size: 22px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .tracker-card p {
+            color: #90a4ae;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .tracker-card .badge {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .tracker-card.coming-soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .tracker-card.coming-soon .badge {
+            background: linear-gradient(135deg, #78909c, #546e7a);
+        }
+
+        .tracker-card.coming-soon:hover {
+            transform: none;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            color: #546e7a;
+            font-size: 13px;
+        }
+
+        /* ===== TRACKER VIEW ===== */
+        .tracker-view {
+            display: none;
+        }
+
+        .nav-bar {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #4fc3f7;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            background: #4fc3f7;
+            color: #1a1a2e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .container h1 {
+            text-align: center;
+            color: #1877f2;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #65676b;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add {
+            background-color: #42b72a;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: #36a420;
+        }
+
+        .btn-remove {
+            background-color: #fa3e3e;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-remove:hover {
+            background-color: #d93025;
+        }
+
+        .btn-confirm-remove {
+            background-color: #d93025;
+            color: white;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            animation: pulse 0.5s ease;
+        }
+
+        .btn-cancel {
+            background-color: #65676b;
+            color: white;
+            padding: 6px 12px;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e4e6eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        thead {
+            background-color: #1877f2;
+            color: white;
+        }
+
+        th {
+            padding: 14px 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e4e6eb;
+            transition: all 0.3s ease;
+        }
+
+        tr:hover td {
+            background-color: #f0f7ff;
+        }
+
+        td input[type="text"], td input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dddfe2;
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        td input[type="text"]:focus, td input[type="date"]:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24,119,242,0.2);
+        }
+
+        td input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #42b72a;
+        }
+
+        .completed {
+            background-color: #e6f9e0 !important;
+            text-decoration: line-through;
+            color: #65676b;
+        }
+
+        .completed input[type="text"], .completed input[type="date"] {
+            text-decoration: line-through;
+            color: #65676b;
+            background-color: #e6f9e0;
+        }
+
+        .row-number {
+            font-weight: 600;
+            color: #65676b;
+            width: 40px;
+        }
+
+        .legend {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #65676b;
+        }
+
+        .legend h3 {
+            margin-bottom: 8px;
+            color: #1c1e21;
+            font-size: 14px;
+        }
+
+        .legend ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .counter {
+            font-size: 14px;
+            color: #65676b;
+        }
+
+        .row-deleting {
+            background-color: #fff0f0 !important;
+        }
+
+        .row-deleting td {
+            background-color: #fff0f0 !important;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .container { padding: 15px; }
+            .header h1 { font-size: 32px; }
+            .trackers-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HOME VIEW ===== -->
+    <div class="home-view" id="homeView">
+        <div class="header">
+            <h1><span>Cesar</span> Trackers</h1>
+            <p>Your central hub for tracking and managing work procedures</p>
+        </div>
+
+        <div class="trackers-grid">
+            <div class="tracker-card" onclick="showTracker('vendorTracker')">
+                <span class="tracker-icon">&#128203;</span>
+                <h2>Vendor Tracker</h2>
+                <p>Track vendor procedures, monitor progress, and manage VP steps, risks, and work authorizations.</p>
+                <span class="badge">OPEN TRACKER &rarr;</span>
+            </div>
+
+            <div class="tracker-card coming-soon">
+                <span class="tracker-icon">&#128296;</span>
+                <h2>More Coming Soon</h2>
+                <p>Additional trackers can be added here as your needs grow.</p>
+                <span class="badge">COMING SOON</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; Cesar Trackers 2026 &mdash; All procedures in one place</p>
+        </div>
+    </div>
+
+    <!-- ===== VENDOR TRACKER VIEW ===== -->
+    <div class="tracker-view" id="vendorTracker">
+        <div class="nav-bar">
+            <span class="back-link" onclick="showHome()">&larr; Back to Cesar Trackers</span>
+        </div>
+        <div class="container">
+            <h1>&#128203; Vendor Procedures Tracker</h1>
+            <p class="subtitle">Track and manage upcoming vendor procedures and their progress</p>
+
+            <div class="controls">
+                <span class="counter" id="rowCounter">0 procedures tracked</span>
+                <button class="btn btn-add" onclick="addRow()">+ Add New Procedure</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="vpTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>VP Name</th>
+                            <th>VP Number</th>
+                            <th>Facops Support</th>
+                            <th>Date for Work</th>
+                            <th>VP Steps</th>
+                            <th>VP Risk</th>
+                            <th>VP WA</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="legend">
+                <h3>Legend</h3>
+                <ul>
+                    <li><div class="legend-color" style="background-color: #e6f9e0; border: 1px solid #42b72a;"></div> Checkbox marked = Step completed</li>
+                    <li><div class="legend-color" style="background-color: #fff3cd; border: 1px solid #ffc107;"></div> Pending items</li>
+                    <li>&#9989; Check all boxes in a row to mark the procedure as fully complete</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rowCount = 0;
+
+        function showTracker(trackerId) {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById(trackerId).style.display = 'block';
+        }
+
+        function showHome() {
+            document.getElementById('homeView').style.display = 'flex';
+            var views = document.querySelectorAll('.tracker-view');
+            for (var i = 0; i < views.length; i++) {
+                views[i].style.display = 'none';
+            }
+        }
+
+        function addRow() {
+            rowCount++;
+            var tbody = document.getElementById('tableBody');
+            var row = document.createElement('tr');
+            row.setAttribute('id', 'row-' + rowCount);
+
+            row.innerHTML = '<td class="row-number">' + rowCount + '</td>' +
+                '<td><input type="text" placeholder="Enter VP name..." /></td>' +
+                '<td><input type="text" placeholder="VP-000" /></td>' +
+                '<td><input type="checkbox" onchange="toggleComplete(this)" title="Mark Facops Support complete" /></td>' +
+                '<td><input type="date" /></td>' +
+                '<td><input type="checkbox" onchange="toggleComplete(this)" title="Mark VP Steps complete" /></td>' +
+                '<td><input type="checkbox" onchange="toggleComplete(this)" title="Mark VP Risk complete" /></td>' +
+                '<td><input type="checkbox" onchange="toggleComplete(this)" title="Mark VP WA complete" /></td>' +
+                '<td><button class="btn btn-remove" onclick="removeRow(this)">&#10006; Remove</button></td>';
+
+            tbody.appendChild(row);
+            updateCounter();
+        }
+
+        function removeRow(button) {
+            var row = button.closest('tr');
+            var actionCell = button.closest('td');
+
+            // Replace button with confirm/cancel
+            actionCell.innerHTML = '<button class="btn btn-confirm-remove" onclick="confirmRemove(this)">Confirm</button>' +
+                '<button class="btn btn-cancel" onclick="cancelRemove(this)">Cancel</button>';
+
+            // Highlight row in red
+            row.classList.add('row-deleting');
+        }
+
+        function confirmRemove(button) {
+            var row = button.closest('tr');
+            row.style.opacity = '0';
+            row.style.transition = 'opacity 0.3s ease';
+            setTimeout(function() {
+                row.remove();
+                renumberRows();
+                updateCounter();
+            }, 300);
+        }
+
+        function cancelRemove(button) {
+            var row = button.closest('tr');
+            var actionCell = button.closest('td');
+
+            // Restore original remove button
+            actionCell.innerHTML = '<button class="btn btn-remove" onclick="removeRow(this)">&#10006; Remove</button>';
+
+            // Remove red highlight
+            row.classList.remove('row-deleting');
+        }
+
+        function toggleComplete(checkbox) {
+            var cell = checkbox.closest('td');
+            if (checkbox.checked) {
+                cell.classList.add('completed');
+            } else {
+                cell.classList.remove('completed');
+            }
+
+            var row = checkbox.closest('tr');
+            var allCheckboxes = row.querySelectorAll('input[type="checkbox"]');
+            var allChecked = true;
+            for (var i = 0; i < allCheckboxes.length; i++) {
+                if (!allCheckboxes[i].checked) {
+                    allChecked = false;
+                    break;
+                }
+            }
+
+            var allCells = row.querySelectorAll('td');
+            if (allChecked) {
+                for (var i = 0; i < allCells.length; i++) {
+                    allCells[i].classList.add('completed');
+                }
+            } else {
+                for (var i = 0; i < allCells.length; i++) {
+                    var cb = allCells[i].querySelector('input[type="checkbox"]');
+                    if (cb && cb.checked) {
+                        allCells[i].classList.add('completed');
+                    } else if (cb && !cb.checked) {
+                        allCells[i].classList.remove('completed');
+                    } else {
+                        allCells[i].classList.remove('completed');
+                    }
+                }
+            }
+        }
+
+        function renumberRows() {
+            var rows = document.querySelectorAll('#tableBody tr');
+            for (var i = 0; i < rows.length; i++) {
+                rows[i].querySelector('.row-number').textContent = i + 1;
+            }
+            rowCount = rows.length;
+        }
+
+        function updateCounter() {
+            var count = document.querySelectorAll('#tableBody tr').length;
+            document.getElementById('rowCounter').textContent = count + ' procedure' + (count !== 1 ? 's' : '') + ' tracked';
+        }
+
+        // Start with one empty row
+        addRow();
+    </script>
+</body>
+</html>
